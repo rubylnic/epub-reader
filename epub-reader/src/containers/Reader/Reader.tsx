@@ -110,17 +110,12 @@ const Reader = ({
     }));
   };
 
-  const applyBookStyle = (rendition: Rendition, style: BookStyle) => {
-    rendition.themes.register('custom', {
-      body: {
-        'font-size': `${style.fontSize}px`,
-        'line-height': style.lineHeight,
-        'padding-left': '70px',
-        'padding-right': '80px',
-      },
-    });
-    rendition.themes.select('custom');
-  };
+const applyBookStyle = (rendition: Rendition, style: BookStyle) => {
+  rendition.themes.select('custom');
+
+  rendition.themes.override('font-size', `${style.fontSize}px`);
+  rendition.themes.override('line-height', String(style.lineHeight));
+};
 
   const applyBookOption = (rendition: Rendition, option: BookOption) => {
     rendition.flow(option.flow);
@@ -141,6 +136,8 @@ const Reader = ({
 
     await book.ready;
 
+     _rendition.themes.register('custom', { body: {} });
+  _rendition.themes.select('custom');
     applyBookStyle(_rendition, bookStyle);
     applyBookOption(_rendition, bookOption);
 

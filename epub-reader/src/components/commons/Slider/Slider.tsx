@@ -1,6 +1,6 @@
-import SliderValue from '@components/option/Slider/SliderValue/SliderValue';
+import { iconMap } from '../../../assets/images/iconMap';
 import styles from './Slider.module.scss';
-import { iconMap } from '../../../images/icons/iconMap';
+import SliderValue from './SliderValue/SliderValue';
 
 type Props = {
   active: boolean;

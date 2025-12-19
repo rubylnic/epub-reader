@@ -1,4 +1,4 @@
-import SliderBar from '@components/option/Slider/SliderBar/SliderBar';
+import SliderBar from '../SliderBar/SliderBar';
 import styles from './SliderValue.module.scss';
 
 type Props = {
