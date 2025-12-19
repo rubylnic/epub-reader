@@ -1,73 +1,34 @@
-# React + TypeScript + Vite
+# EPUB Reader
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Небольшая EPUB-читалка на React + Vite. Поддерживает открытие книги, навигацию по главам и базовые настройки отображения текста.
 
-Currently, two official plugins are available:
+## Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 📚 Чтение EPUB (через `epubjs` / `react-reader`)
+- 🧭 Окно навигации по главам (TOC)
+- 🔤 Окно настроек:
+  - изменение **размера шрифта**
+  - изменение **межстрочного интервала**
+  - режимы отображения (Показать текст в 2 колонки, Прокрутка текста)
+- 💾 Сохранение прогресса чтения и настроек (через `localStorage`)
+- ⏳ Индикатор загрузки книги (progress)
 
-## React Compiler
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## Требования
 
-## Expanding the ESLint configuration
+- Node.js 18+ (рекомендуется)
+- npm / yarn / pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Установка
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Запуск в режиме разработки
 ```
+npm run dev
+```
+
+## Важно!
+Для того чтобы демо работало пришлось некоторые переменные заменить моками, в App.tsx есть **// TODO: заменить на реальные данные**, в том же файле еще ниже есть несколько **TODO:**, которые надо раскомментировать. Папку **bookExamples** тоже можно будет потом удалить.

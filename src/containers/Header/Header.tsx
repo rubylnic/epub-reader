@@ -20,6 +20,7 @@ const Header = ({
   id,
   currentMenu,
 }: Props) => {
+
   const onGoBackClick = () => {
     if (id) {
       window.location.href = `${id}?dsf=1`;

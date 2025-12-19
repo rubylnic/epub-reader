@@ -101,7 +101,7 @@ const Reader = ({
     });
   };
 
-  const setLSBookInfo = (loc:string, percentLoc: number) => {
+  const setLSBookInfo = (loc: string, percentLoc: number) => {
     localStorage.setItem(`book_${bookId}`, JSON.stringify({
       location: loc || location,
       ...(percentLoc ? { percent: percentLoc } : {}),
@@ -110,12 +110,12 @@ const Reader = ({
     }));
   };
 
-const applyBookStyle = (rendition: Rendition, style: BookStyle) => {
-  rendition.themes.select('custom');
+  const applyBookStyle = (rendition: Rendition, style: BookStyle) => {
+    rendition.themes.select('custom');
 
-  rendition.themes.override('font-size', `${style.fontSize}px`);
-  rendition.themes.override('line-height', String(style.lineHeight));
-};
+    rendition.themes.override('font-size', `${style.fontSize}px`);
+    rendition.themes.override('line-height', String(style.lineHeight));
+  };
 
   const applyBookOption = (rendition: Rendition, option: BookOption) => {
     rendition.flow(option.flow);
@@ -136,8 +136,8 @@ const applyBookStyle = (rendition: Rendition, style: BookStyle) => {
 
     await book.ready;
 
-     _rendition.themes.register('custom', { body: {} });
-  _rendition.themes.select('custom');
+    _rendition.themes.register('custom', { body: {} });
+    _rendition.themes.select('custom');
     applyBookStyle(_rendition, bookStyle);
     applyBookOption(_rendition, bookOption);
 
@@ -250,14 +250,14 @@ const applyBookStyle = (rendition: Rendition, style: BookStyle) => {
                 className={styles.viewerWrapper}
               >
                 {url && (
-                <EpubView
-                  ref={readerRef}
-                  url={url}
-                  location={location}
-                  tocChanged={(_toc) => removeNotAvailableTocs(_toc)}
-                  locationChanged={onLocationChanged}
-                  getRendition={getRendition}
-                />
+                  <EpubView
+                    ref={readerRef}
+                    url={url}
+                    location={location}
+                    tocChanged={(_toc) => removeNotAvailableTocs(_toc)}
+                    locationChanged={onLocationChanged}
+                    getRendition={getRendition}
+                  />
                 )}
               </div>
               <button

@@ -4,10 +4,14 @@ import Reader from './containers/Reader/Reader';
 import styles from './containers/Reader/Reader.module.scss';
 import book from './assets/bookExamples/example.epub'
 
+
+// TODO: заменить на реальные данные
 const BOOK_TITLE = 'Название книги';
 const BOOK_AUTHOR = 'Автор книги';
+const BOOK_URL = "";
 const COVER_URL = 'https://card-content.yotoplay.com/yoto/pub/19c7YnR3W_THnnAH2vzjxEqFytwqHscWtApXD7sZ_p4';
 const ID = '';
+
 
 function App() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -17,7 +21,7 @@ function App() {
   const [downloadProgress, setDownloadProgress] = useState(100);
   const [error, setError] = useState<string | null>(null);
 
-  // TODO: тут загрузка книги, для наглядности пока добавила заглушку из локального файла
+  // TODO: тут загрузка книги, для наглядности пока добавила заглушку из локального файла, надо раскомментировать useEffect
 
   // useEffect(() => {
   //   let xhr: XMLHttpRequest | null = null;
@@ -88,7 +92,7 @@ function App() {
     <div className={styles.commonContainer} ref={containerRef}>
       {error && <ErrorMessage message={error} />}
         <Reader
-        // TODO:
+        // TODO: раскомментировать строку ниже и убрать url={book}
           // url={arrayBuffer}
           url={book}
           id={ID}
