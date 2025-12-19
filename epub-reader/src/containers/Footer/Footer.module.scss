@@ -1,0 +1,101 @@
+@use "../../assets/scss/variables" as *;
+@use "../../assets/scss/mixins" as *;
+
+.footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #fff;
+
+  @include media($lg) {
+    border-top: 1px solid #d6d6d6;
+  }
+
+  button {
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    background-color: transparent;
+
+    @include min-media($lg) {
+      display: none;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: 20px;
+
+  @include media($lg) {
+    flex-direction: column;
+    padding: 12px;
+  }
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 125%;
+  letter-spacing: -0.28px;
+
+  @include media($xl) {
+    font-size: 12px;
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  max-width: 100%;
+  overflow: visible;
+  font-size: 12px;
+  line-height: 125%;
+  letter-spacing: -0.24px;
+  color: #8f938d;
+
+  @include min-media($xl) {
+    visibility: hidden;
+  }
+
+  @include min-media($lg) {
+    margin-bottom: 0;
+    max-width: 70%;
+  }
+}
+
+.title {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.totalPage {
+  span {
+    font-weight: 500;
+  }
+}

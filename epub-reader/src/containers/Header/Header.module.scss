@@ -1,0 +1,114 @@
+@use "../../assets/scss/variables" as *;
+@use "../../assets/scss/mixins" as *;
+
+.header {
+  z-index: 10;
+  background-color: #f5f5f5;
+}
+
+.title {
+  max-width: 600px;
+  overflow: hidden;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 125%;
+  letter-spacing: -0.24px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #1f1f1f;
+
+  @include media($xl) {
+    display: none;
+  }
+}
+
+.container {
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: 20px;
+
+  @include media($xl) {
+    padding-inline: 16px;
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 125%;
+  letter-spacing: -0.24px;
+  color: #8f938d;
+  background-color: transparent;
+  gap: 8px;
+
+  span {
+    @include media($xl) {
+      display: none;
+    }
+  }
+}
+
+.button {
+  padding: 0;
+  height: 24px;
+  background-color: transparent;
+
+  @include media($xl) {
+    height: 20px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &:hover {
+    svg,
+    path {
+      stroke: #24a600;
+      transition: ease-in 0.3s;
+    }
+  }
+
+  &--active {
+    svg,
+    path {
+      stroke: #24a600;
+      transition: ease-in 0.3s;
+    }
+  }
+}
+
+.buttonFill {
+  &:hover {
+    svg * {
+      stroke: rgba(0, 0, 0, 0);
+    }
+
+    path {
+      fill: #24a600;
+    }
+  }
+}
+
+.right {
+  display: flex;
+  gap: 57px;
+
+  @include media($xl) {
+    gap: 21px;
+  }
+}

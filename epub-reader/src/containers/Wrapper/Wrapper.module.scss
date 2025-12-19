@@ -1,0 +1,76 @@
+.container {
+  position: fixed;
+  right: 0;
+  top: 112px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  width: 320px;
+  height: calc(100% - 112px);
+  max-width: 95vw;
+  overflow-y: auto;
+  border-radius: 16px 0 0 16px;
+  box-shadow: -4px 0 8px 0 rgba(0, 0, 0, 0.16);
+  background-color: #fff;
+  transform: translateX(420px) scale(0.9);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  padding-inline: 24px;
+
+  &--visible {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  &--noMargin {
+    padding-inline: 0;
+  }
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 9;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+  inset: 0;
+
+  &--visible {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+  }
+
+  &--display {
+    transition: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 40px;
+  width: 100%;
+  min-height: 40px;
+
+  > span {
+    font-weight: 600;
+    font-size: 20px;
+  }
+}
+
+.button {
+  box-sizing: content-box;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+  padding: 8px;
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+}

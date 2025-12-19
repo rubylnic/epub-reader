@@ -1,0 +1,19 @@
+.container {
+
+}
+
+.tocs {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: auto;
+}
+
+.subtitle {
+  margin-bottom: 12px;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 120%;
+  letter-spacing: -0.4px;
+  padding-inline: 24px;
+}
