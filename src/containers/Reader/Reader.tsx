@@ -56,7 +56,8 @@ const Reader = ({
   const zoomOut = () => setScale((s) => Math.max(s - 0.2, 0.5));
   const [containerRef, containerHeight] = useElementHeight<HTMLDivElement>(isEpub);
   const footerHeight = window.matchMedia('(max-width: 992px)').matches ? 150 : 80;
-  const pdfHeight = containerHeight ? Math.min(containerHeight - footerHeight, MAX_PDF_HEIGHT) : MAX_PDF_HEIGHT;
+  const pdfHeight = containerHeight && scale <= 1 ? Math.min(containerHeight - footerHeight, MAX_PDF_HEIGHT) : MAX_PDF_HEIGHT;
+  console.log(pdfHeight, containerHeight);
 
   const [currentLocation, setCurrentLocation] = useState({
     currentPage: 0, totalPage: 0, chapterIndex: 0, atStart: false, atEnd: false,

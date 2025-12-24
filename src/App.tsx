@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import ErrorMessage from './components/commons/ErrorMessage/ErrorMessage';
 import Reader from './containers/Reader/Reader';
 import styles from './containers/Reader/Reader.module.scss';
-// import book from './assets/bookExamples/example.epub'
-import book from './assets/bookExamples/example.pdf'
+// TODO: удалить, это только для демо
+import epubBook from './assets/bookExamples/example.epub';
+// TODO: удалить, это только для демо
+import pdfBook from './assets/bookExamples/example.pdf';
 
 
 // TODO: заменить на реальные данные
@@ -12,20 +14,22 @@ const BOOK_AUTHOR = 'Автор книги';
 const bookUrl = "";
 const COVER_URL = 'https://card-content.yotoplay.com/yoto/pub/19c7YnR3W_THnnAH2vzjxEqFytwqHscWtApXD7sZ_p4';
 const ID = '';
-// TODO: берем формат книги из ссылки (epub или pdf)
-const bookFormat = 'pdf';
-  // const bookFormat = BOOK_URL.split('.').pop()!;
 
 function App() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // TODO: берем формат книги из ссылки (epub или pdf)
+  const [bookFormat, setBookFormat] = useState(null);
+  // const bookFormat = BOOK_URL.split('.').pop()!;
+
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
-   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  // TODO: downloadProgress сразу поставила 100%
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const url = bookFormat === 'pdf' ? pdfUrl : arrayBuffer;
+  // TODO: для демо downloadProgress сразу поставила 100%
   const [downloadProgress, setDownloadProgress] = useState(100);
   const [error, setError] = useState<string | null>(null);
 
-  // TODO: тут загрузка книги, для наглядности пока добавила заглушку из локального файла, надо раскомментировать useEffect
+  // TODO: тут загрузка книги, для демо пока добавила заглушку из локального файла, надо раскомментировать useEffect
 
   // useEffect(() => {
   //   return () => {
@@ -108,17 +112,29 @@ function App() {
   return (
     <div className={styles.commonContainer} ref={containerRef}>
       {error && <ErrorMessage message={error} />}
+      {/* FIXME: то что внутри удалить и оставить только второй Reader, который ниже */}
+      <button onClick={() => { setBookFormat('epub') }}>EPUB</button>
+      <button onClick={() => { setBookFormat('pdf') }}>PDF</button>
+      {bookFormat &&
         <Reader
-        // TODO: раскомментировать строку ниже и убрать url={book}
-          // url={arrayBuffer}
-          url={book}
+          url={bookFormat === 'epub' ? epubBook : pdfBook}
           id={ID}
           bookTitle={BOOK_TITLE}
           bookAuthor={BOOK_AUTHOR}
           coverUrl={COVER_URL}
           downloadProgress={downloadProgress}
           bookFormat={bookFormat}
-        />
+        />}
+        {/* FIXME: вот этот только оставить */}
+      {/* <Reader
+        url={url}
+        id={ID}
+        bookTitle={BOOK_TITLE}
+        bookAuthor={BOOK_AUTHOR}
+        coverUrl={COVER_URL}
+        downloadProgress={downloadProgress}
+        bookFormat={bookFormat}
+      /> */}
     </div>
   );
 }
