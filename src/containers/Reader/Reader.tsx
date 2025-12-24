@@ -57,10 +57,10 @@ const Reader = ({
   const [containerRef, containerHeight] = useElementHeight<HTMLDivElement>(isEpub);
   const footerHeight = window.matchMedia('(max-width: 992px)').matches ? 150 : 80;
   const pdfHeight = containerHeight && scale <= 1 ? Math.min(containerHeight - footerHeight, MAX_PDF_HEIGHT) : MAX_PDF_HEIGHT;
-  console.log(pdfHeight, containerHeight);
+   const initialPage = isEpub ? 0 : 1;
 
   const [currentLocation, setCurrentLocation] = useState({
-    currentPage: 0, totalPage: 0, chapterIndex: 0, atStart: false, atEnd: false,
+    currentPage: parsedBookInfo?.page || initialPage, totalPage: 0, chapterIndex: 0, atStart: false, atEnd: false,
   });
 
 
@@ -92,15 +92,27 @@ const Reader = ({
     setCurrentMenu(null);
   };
 
+  const setLSPdfBookInfo = (page: number) => {
+    localStorage.setItem(`book_${bookId}`, JSON.stringify({
+      page,
+    }));
+  };
+
+  const goToPdfPage = (index: number) => {
+    setCurrentLocation((prev) => ({
+      ...prev,
+      currentPage: index,
+    }));
+    setLSPdfBookInfo(index);
+  };
+
+
   const onPageMove = (type: 'PREV' | 'NEXT') => {
     if (type === 'PREV') {
       if (isEpub && readerRef.current) {
         renditionRef.current?.prev();
       } else {
-        setCurrentLocation((prev) => ({
-          ...prev,
-          currentPage: prev.currentPage > 1 ? prev.currentPage - 1 : 1,
-        }));
+        goToPdfPage(currentLocation.currentPage > 1 ? currentLocation.currentPage - 1 : 1);
       }
     }
 
@@ -108,10 +120,8 @@ const Reader = ({
       if (isEpub && readerRef.current) {
         renditionRef.current?.next();
       } else {
-        setCurrentLocation((prev) => ({
-          ...prev,
-          currentPage: prev.currentPage < prev.totalPage ? prev.currentPage + 1 : prev.currentPage,
-        }));
+        goToPdfPage(currentLocation.currentPage < currentLocation.totalPage
+          ? currentLocation.currentPage + 1 : currentLocation.currentPage);
       }
     }
   };
@@ -155,6 +165,13 @@ const Reader = ({
     body?.classList.add('noPadding');
   }, []);
 
+
+  const goToChapter = (href: string) => {
+    if (renditionRef.current) {
+      renditionRef.current.display(href);
+    }
+  };
+
   const getRendition = async (_rendition: Rendition) => {
     if (!_rendition) return;
     renditionRef.current = _rendition;
@@ -192,18 +209,43 @@ const Reader = ({
   };
 
   useEffect(() => {
-    if (readerRef.current?.rendition) {
+     if (readerRef.current?.rendition && isEpub) {
       applyBookStyle(readerRef.current.rendition, bookStyle);
     }
     setLSBookInfo(location, percent);
-  }, [bookStyle]);
+  }, [bookStyle,isEpub]);
 
   useEffect(() => {
-    if (readerRef.current?.rendition) {
+    if (readerRef.current?.rendition && isEpub) {
       applyBookOption(readerRef.current.rendition, bookOption);
     }
     setLSBookInfo(location, percent);
-  }, [bookOption]);
+  }, [bookOption,isEpub]);
+
+  useEffect(() => {
+    if (bookFormat !== 'pdf') return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
+      const isTyping = tag === 'input' || tag === 'textarea' || (target as any)?.isContentEditable;
+
+      if (isTyping) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        onPageMove('PREV');
+      }
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        onPageMove('NEXT');
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [bookFormat, onPageMove]);
 
   const onLocationChanged = (loc: string) => {
     if (isInitialLocationRef.current) {
@@ -219,23 +261,10 @@ const Reader = ({
     }
   };
 
-  const goToChapter = (href: string) => {
-    if (renditionRef.current) {
-      renditionRef.current.display(href);
-    }
-  };
-
-  const goToPage = (index: number) => {
-    setCurrentLocation((prev) => ({
-      ...prev,
-      currentPage: index,
-    }));
-  };
-
   const onPdfDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setCurrentLocation((prev) => ({
       ...prev,
-      currentPage: 1,
+      currentPage: currentLocation.currentPage,
       totalPage: numPages,
     }));
   };
@@ -356,7 +385,7 @@ const Reader = ({
           show={currentMenu === 'nav'}
           onToggle={onCloseWrapper}
           goToChapter={goToChapter}
-          goToPage={goToPage}
+          goToPage={goToPdfPage}
           toc={toc.current}
           bookTitle={bookTitle}
           bookAuthor={bookAuthor}
