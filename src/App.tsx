@@ -2,21 +2,25 @@ import { useState, useEffect, useRef } from 'react'
 import ErrorMessage from './components/commons/ErrorMessage/ErrorMessage';
 import Reader from './containers/Reader/Reader';
 import styles from './containers/Reader/Reader.module.scss';
-import book from './assets/bookExamples/example.epub'
+// import book from './assets/bookExamples/example.epub'
+import book from './assets/bookExamples/example.pdf'
 
 
 // TODO: заменить на реальные данные
 const BOOK_TITLE = 'Название книги';
 const BOOK_AUTHOR = 'Автор книги';
-const BOOK_URL = "";
+const bookUrl = "";
 const COVER_URL = 'https://card-content.yotoplay.com/yoto/pub/19c7YnR3W_THnnAH2vzjxEqFytwqHscWtApXD7sZ_p4';
 const ID = '';
-
+// TODO: берем формат книги из ссылки (epub или pdf)
+const bookFormat = 'pdf';
+  // const bookFormat = BOOK_URL.split('.').pop()!;
 
 function App() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [arrayBuffer, setArrayBuffer] = useState<ArrayBuffer | null>(null);
+   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   // TODO: downloadProgress сразу поставила 100%
   const [downloadProgress, setDownloadProgress] = useState(100);
   const [error, setError] = useState<string | null>(null);
@@ -24,12 +28,18 @@ function App() {
   // TODO: тут загрузка книги, для наглядности пока добавила заглушку из локального файла, надо раскомментировать useEffect
 
   // useEffect(() => {
+  //   return () => {
+  //     if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+  //   };
+  // }, [pdfUrl]);
+
+  // useEffect(() => {
   //   let xhr: XMLHttpRequest | null = null;
   //   let cancelled = false;
 
   //   const loadBook = async () => {
   //     try {
-  //       const metaRes = await fetch(BOOK_URL, {
+  //       const metaRes = await fetch(bookUrl, {
   //         credentials: 'include',
   //       });
   //       const { url: fileUrl } = await metaRes.json();
@@ -59,7 +69,14 @@ function App() {
   //         if (cancelled) return;
 
   //         if (xhr!.status >= 200 && xhr!.status < 300) {
-  //           setArrayBuffer(xhr!.response);
+  //           if (bookFormat === 'pdf') {
+  //             const blob = new Blob([xhr!.response], { type: 'application/pdf' });
+  //             const url = URL.createObjectURL(blob);
+  //             setPdfUrl(url);
+  //             setArrayBuffer(null);
+  //           } else {
+  //             setArrayBuffer(xhr!.response);
+  //           }
   //           setDownloadProgress(100);
   //         } else {
   //           setError(`Ошибка загрузки файла: ${xhr!.status}`);
@@ -86,7 +103,7 @@ function App() {
   //     cancelled = true;
   //     if (xhr) xhr.abort();
   //   };
-  // }, [BOOK_URL]);
+  // }, [bookUrl]);
 
   return (
     <div className={styles.commonContainer} ref={containerRef}>
@@ -100,6 +117,7 @@ function App() {
           bookAuthor={BOOK_AUTHOR}
           coverUrl={COVER_URL}
           downloadProgress={downloadProgress}
+          bookFormat={bookFormat}
         />
     </div>
   );

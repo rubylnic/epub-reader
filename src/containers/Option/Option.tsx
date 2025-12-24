@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import cn from 'classnames';
 import {
   BookStyle, BookOption,
 } from 'types/book';
@@ -7,6 +8,7 @@ import Slider from '../../components/commons/Slider/Slider';
 import { Checkbox } from '../../components/commons/Checkbox/Checkbox';
 
 type Props = {
+  show: boolean;
   bookStyle: BookStyle;
   bookOption: BookOption;
   onBookStyleChange: (bookStyle: BookStyle) => void;
@@ -22,12 +24,13 @@ type ViewType = {
 };
 
 const Option = ({
+  show,
   bookStyle,
   bookOption,
   onBookStyleChange,
   onBookOptionChange,
 }: Props) => {
-  console.log(bookOption);
+
   const [fontSize, setFontSize] = useState<number>(bookStyle.fontSize);
   const [lineHeight, setLineHeight] = useState<number>(bookStyle.lineHeight);
   const [isVertical, setIsVertical] = useState<boolean>(bookOption.flow === 'scrolled');
@@ -95,7 +98,7 @@ const Option = ({
 
   return (
     <>
-      <div className={styles.container}>
+       <div className={cn(styles.container, { [styles['container--show']]: show })}>
         <Slider
           active
           title="Размер шрифта"

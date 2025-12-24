@@ -4,6 +4,8 @@ import { ArrowBackIcon } from '../../assets/images/ArrowBackIcon';
 import { ContentIcon } from '../../assets/images/ContentIcon';
 import { SettingsIcon } from '../../assets/images/SettingsIcon';
 import { CrossIcon } from '../../assets/images/CrossIcon';
+import { MagnifierPlusIcon } from '../../assets/images/MagnifierPlusIcon';
+import { MagnifierMinusIcon } from '../../assets/images/MagnifierMinusIcon';
 
 type Props = {
   onMenuToggle: (type: 'nav' | 'option') => void;
@@ -11,6 +13,9 @@ type Props = {
   bookTitle: string;
   bookAuthor: string;
   currentMenu: string | null;
+  isEpub: boolean;
+  zoomIn: () => void;
+  zoomOut: () => void;
 };
 
 const Header = ({
@@ -19,6 +24,9 @@ const Header = ({
   bookAuthor,
   id,
   currentMenu,
+  isEpub,
+  zoomIn,
+  zoomOut,
 }: Props) => {
 
   const onGoBackClick = () => {
@@ -36,7 +44,7 @@ const Header = ({
   };
 
   return (
-    <div className={styles.header}>
+    <div className={cn(styles.header, { [styles['header--pdf']]: !isEpub })}>
       <div className={styles.container}>
         <div className={styles.left}>
           <button type="button" className={styles.backButton} onClick={onGoBackClick}><ArrowBackIcon /><span>Вернуться</span></button>
@@ -52,15 +60,26 @@ const Header = ({
           >
             <ContentIcon />
           </button>
-          <button
-            type="button"
-            className={cn(styles.button, {
-              [styles['button--active']]: currentMenu === 'option',
-            })}
-            onClick={openOptionMenu}
-          >
-            <SettingsIcon />
-          </button>
+          {isEpub ? (
+            <button
+              type="button"
+              className={cn(styles.button, {
+                [styles['button--active']]: currentMenu === 'option',
+              })}
+              onClick={openOptionMenu}
+            >
+              <SettingsIcon />
+            </button>
+          ) : (
+            <>
+              <button type="button" className={cn(styles.button, styles.buttonFill)} onClick={zoomIn}>
+                <MagnifierPlusIcon />
+              </button>
+              <button type="button" className={cn(styles.button, styles.buttonFill)} onClick={zoomOut}>
+                <MagnifierMinusIcon />
+              </button>
+            </>
+          )}
           <button type="button" className={cn(styles.button)} onClick={onGoBackClick}>
             <CrossIcon />
           </button>

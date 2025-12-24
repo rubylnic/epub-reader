@@ -1,3 +1,4 @@
+import cn from 'classnames';
 import { ArrowIcon } from '../../assets/images/ArrowIcon';
 import { ArrowRightIcon } from '../../assets/images/ArrowRightIcon';
 import styles from './Footer.module.scss';
@@ -6,11 +7,12 @@ type Props = {
   currentLocation: { currentPage: number, totalPage: number, chapterIndex: number; atStart: boolean, atEnd: boolean },
   bookTitle: string;
   bookAuthor: string;
-  onPageMove: any;
+  onPageMove: (type: "PREV" | "NEXT") => void;
+  isEpub: boolean;
 };
 
 const Footer = ({
-  currentLocation, bookTitle, bookAuthor, onPageMove,
+  currentLocation, bookTitle, bookAuthor, onPageMove, isEpub,
 }: Props) => {
   const {
     currentPage, totalPage, chapterIndex, atStart, atEnd,
@@ -19,13 +21,15 @@ const Footer = ({
   const handleNext = () => onPageMove('NEXT');
 
   return (
-    <div className={styles.footer}>
+     <div className={cn(styles.footer, {
+      [styles['footer--pdf']]: !isEpub,
+    })}>
       <div className={styles.container}>
         <div className={styles.left}>
           {bookTitle && (
-          <span className={styles.title}>
-            {bookAuthor} &laquo;{bookTitle}&raquo;
-          </span>
+            <span className={styles.title}>
+              {bookAuthor} &laquo;{bookTitle}&raquo;
+            </span>
           )}
         </div>
         <div className={styles.right}>
@@ -37,7 +41,8 @@ const Footer = ({
           >
             <ArrowIcon />
           </button>
-          {(totalPage > 0 && chapterIndex > 0) && <div className={styles.totalPage}><span>Раздел {chapterIndex}</span> {`стр. ${currentPage}/${totalPage}`}</div>}
+          {!isEpub && totalPage > 0 && <div className={styles.totalPage}>{`стр. ${currentPage}/${totalPage}`}</div>}
+          {(totalPage > 0 && chapterIndex > 0) && <div className={styles.totalPage}><span>Раздел {chapterIndex}</span> {`стр. ${currentLocation.currentPage}/${currentLocation.totalPage}`}</div>}
           <button
             type="button"
             className={styles.next}

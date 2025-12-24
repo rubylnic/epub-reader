@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import cn from 'classnames';
 import styles from './Wrapper.module.scss';
 import { CrossIcon } from '../../assets/images/CrossIcon';
@@ -14,18 +14,6 @@ type Props = {
 const Wrapper = ({
   title, show, onClose, noMargin, children,
 }: Props) => {
-  const [shouldRender, setShouldRender] = useState(show);
-
-  useEffect(() => {
-    if (show) {
-      setShouldRender(true);
-    } else {
-      const timeout = setTimeout(() => setShouldRender(false), 300); // match CSS transition
-      return () => clearTimeout(timeout);
-    }
-  }, [show]);
-
-  if (!shouldRender) return null;
 
   return (
     <div

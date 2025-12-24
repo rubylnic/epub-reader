@@ -12,12 +12,15 @@ import { ArrowRightIcon } from '../../assets/images/ArrowRightIcon';
 import { ArrowIcon } from '../../assets/images/ArrowIcon';
 import LoadingComponent from '../../components/commons/LoadingComponent/LoadingComponent';
 import Wrapper from '../Wrapper/Wrapper';
+import useElementHeight from '../../hooks/useElementHeight';
+import PdfReader from '../PdfReader/PdfReader';
 
 type Props = {
-  url: ArrayBuffer | null;
+  url: string | ArrayBuffer | null;
   id: string;
   bookTitle: string;
   bookAuthor: string;
+  bookFormat: string;
   coverUrl: string | null;
   downloadProgress: number;
 };
@@ -35,23 +38,35 @@ const initBookOption = {
   spread: 'always',
 };
 
+const MAX_PDF_HEIGHT = 760;
+
 const Reader = ({
-  url, id, bookTitle, bookAuthor, coverUrl, downloadProgress,
+  url, id, bookTitle, bookAuthor, coverUrl, downloadProgress, bookFormat,
 }: Props) => {
   const { pathname } = window.location;
   const bookId = pathname.split('/').pop();
   const savedBookInfo = localStorage.getItem(`book_${bookId}`);
   const parsedBookInfo = savedBookInfo ? JSON.parse(savedBookInfo) : null;
 
+  const isEpub = bookFormat === 'epub';
+  const isAvailableBookFormat = bookFormat === 'epub' || bookFormat === 'pdf';
+
+  const [scale, setScale] = useState(1);
+  const zoomIn = () => setScale((s) => Math.min(s + 0.2, 3));
+  const zoomOut = () => setScale((s) => Math.max(s - 0.2, 0.5));
+  const [containerRef, containerHeight] = useElementHeight<HTMLDivElement>(isEpub);
+  const footerHeight = window.matchMedia('(max-width: 992px)').matches ? 150 : 80;
+  const pdfHeight = containerHeight ? Math.min(containerHeight - footerHeight, MAX_PDF_HEIGHT) : MAX_PDF_HEIGHT;
+
   const [currentLocation, setCurrentLocation] = useState({
     currentPage: 0, totalPage: 0, chapterIndex: 0, atStart: false, atEnd: false,
   });
+
 
   const renditionRef = useRef<Rendition | undefined>(undefined);
   const isInitialLocationRef = useRef(true);
   const toc = useRef<NavItem[]>([]);
   const totalPagesRef = useRef(0);
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const readerRef = useRef<EpubView | null>(null);
 
   const [location, setLocation] = useState(parsedBookInfo?.location || 0);
@@ -78,14 +93,24 @@ const Reader = ({
 
   const onPageMove = (type: 'PREV' | 'NEXT') => {
     if (type === 'PREV') {
-      if (readerRef.current) {
+      if (isEpub && readerRef.current) {
         renditionRef.current?.prev();
+      } else {
+        setCurrentLocation((prev) => ({
+          ...prev,
+          currentPage: prev.currentPage > 1 ? prev.currentPage - 1 : 1,
+        }));
       }
     }
 
     if (type === 'NEXT') {
-      if (readerRef.current) {
+      if (isEpub && readerRef.current) {
         renditionRef.current?.next();
+      } else {
+        setCurrentLocation((prev) => ({
+          ...prev,
+          currentPage: prev.currentPage < prev.totalPage ? prev.currentPage + 1 : prev.currentPage,
+        }));
       }
     }
   };
@@ -199,6 +224,21 @@ const Reader = ({
     }
   };
 
+  const goToPage = (index: number) => {
+    setCurrentLocation((prev) => ({
+      ...prev,
+      currentPage: index,
+    }));
+  };
+
+  const onPdfDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setCurrentLocation((prev) => ({
+      ...prev,
+      currentPage: 1,
+      totalPage: numPages,
+    }));
+  };
+
   const removeNotAvailableTocs = (_toc: NavItem[]) => {
     toc.current = _toc.filter((item) => {
       const label = item.label.toLowerCase();
@@ -224,11 +264,15 @@ const Reader = ({
           bookTitle={bookTitle}
           bookAuthor={bookAuthor}
           id={id}
+          isEpub={isEpub}
+          zoomIn={zoomIn}
+          zoomOut={zoomOut}
           currentMenu={currentMenu}
         />
         {url ? (
           <div
             className={styles.container}
+            // @ts-ignore
             ref={containerRef}
           >
             <div className={styles.readerContainer}>
@@ -242,23 +286,33 @@ const Reader = ({
                 type="button"
                 className={cn(styles.arrowButton, styles.arrowButtonPrev)}
                 onClick={() => onPageMove('PREV')}
-                disabled={currentLocation.atStart}
+                disabled={isEpub ? currentLocation.atStart : currentLocation.currentPage === 1}
               >
                 <ArrowIcon />
               </button>
-              <div
-                className={styles.viewerWrapper}
-              >
-                {url && (
-                  <EpubView
-                    ref={readerRef}
-                    url={url}
-                    location={location}
-                    tocChanged={(_toc) => removeNotAvailableTocs(_toc)}
-                    locationChanged={onLocationChanged}
-                    getRendition={getRendition}
-                  />
-                )}
+              <div className={cn(styles.viewerWrapper, { [styles['viewerWrapper--scrolled']]: !isEpub, [styles['viewerWrapper--zoomed']]: scale > 1 })}>
+                {url && isAvailableBookFormat
+                  && (!isEpub ? (
+                    <PdfReader
+                      url={url}
+                      onPdfDocumentLoadSuccess={onPdfDocumentLoadSuccess}
+                      pdfPageNumber={currentLocation.currentPage}
+                      height={pdfHeight}
+                      scale={scale}
+                    />
+                  )
+                    : (
+                      <EpubView
+                        ref={readerRef}
+                        url={url}
+                        location={location}
+                        tocChanged={(_toc) => removeNotAvailableTocs(_toc)}
+                        locationChanged={onLocationChanged}
+                        getRendition={getRendition}
+                      />
+                    )
+                  )}
+
               </div>
               <button
                 type="button"
@@ -270,7 +324,7 @@ const Reader = ({
                 type="button"
                 className={cn(styles.arrowButton, styles.arrowButtonNext)}
                 onClick={() => onPageMove('NEXT')}
-                disabled={currentLocation.atEnd}
+                disabled={isEpub ? currentLocation.atEnd : currentLocation.currentPage === currentLocation.totalPage}
               >
                 <ArrowRightIcon />
               </button>
@@ -278,12 +332,16 @@ const Reader = ({
           </div>
         )
           : <LoadingComponent percent={downloadProgress} />}
-        <Footer
-          currentLocation={currentLocation}
-          bookTitle={bookTitle}
-          onPageMove={onPageMove}
-          bookAuthor={bookAuthor}
-        />
+
+        {scale <= 1 && (
+          <Footer
+            currentLocation={currentLocation}
+            bookTitle={bookTitle}
+            onPageMove={onPageMove}
+            bookAuthor={bookAuthor}
+            isEpub={isEpub}
+          />
+        )}
       </div>
 
       <Wrapper
@@ -292,25 +350,29 @@ const Reader = ({
         show={currentMenu !== null}
         onClose={onCloseWrapper}
       >
-        {currentMenu === 'nav' ? (
-          <Nav
-            onToggle={onCloseWrapper}
-            goToChapter={goToChapter}
-            toc={toc.current}
-            bookTitle={bookTitle}
-            bookAuthor={bookAuthor}
-            coverUrl={coverUrl}
-          />
-        ) : null}
 
-        {currentMenu === 'option' ? (
-          <Option
-            bookStyle={bookStyle}
-            bookOption={bookOption}
-            onBookStyleChange={onBookStyleChange}
-            onBookOptionChange={onBookOptionChange}
-          />
-        ) : null}
+        <Nav
+          show={currentMenu === 'nav'}
+          onToggle={onCloseWrapper}
+          goToChapter={goToChapter}
+          goToPage={goToPage}
+          toc={toc.current}
+          bookTitle={bookTitle}
+          bookAuthor={bookAuthor}
+          coverUrl={coverUrl}
+          isEpub={isEpub}
+          url={url}
+          currentLocation={currentLocation}
+        />
+
+        <Option
+          show={currentMenu === 'option'}
+          bookStyle={bookStyle}
+          bookOption={bookOption}
+          onBookStyleChange={onBookStyleChange}
+          onBookOptionChange={onBookOptionChange}
+        />
+
       </Wrapper>
     </>
   );

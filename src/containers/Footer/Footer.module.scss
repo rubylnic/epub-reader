@@ -34,6 +34,12 @@
       height: 32px;
     }
   }
+
+  &--pdf {
+    @include min-media($lg) {
+      background-color: transparent;
+    }
+  }
 }
 
 .container {
